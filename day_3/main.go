@@ -10,15 +10,16 @@ import (
 
 func main() {
 	readFile, err := os.Open("input.txt")
-	defer readFile.Close()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
-	fileScanner := bufio.NewScanner(readFile)
-	res := 0
-	resTwo := 0
-	i := 0
+	defer readFile.Close()
+	// Creating as int32 lets us skip converting rune to int later, as a rune is just an alias for int32
+	var res int32
+	var resTwo int32
 	var group [3]string
+	var i int
+	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 	for fileScanner.Scan() {
 		text := fileScanner.Text()
@@ -47,10 +48,10 @@ func main() {
 	fmt.Printf("Part 2: %d\n", resTwo)
 }
 
-func get_priority(c rune) int {
+func get_priority(c rune) rune {
 	if unicode.IsLower(c) {
-		return int(c - 96)
+		return c - 96
 	} else {
-		return int(c - 38)
+		return c - 38
 	}
 }
