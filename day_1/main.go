@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strconv"
@@ -36,18 +37,12 @@ func main() {
 			cur += num
 		}
 	}
-	readFile.Close()
 	fmt.Printf("Part 1: %d\n", max)
-	part2(elves)
-	fmt.Printf("Part 2: %d\n", part2(elves))
+	readFile.Seek(0, io.SeekStart)
+	fmt.Printf("Part 2: %d\n", part2(elves, readFile))
 }
 
-func part2(elves int) int {
-	readFile, err := os.Open("input.txt")
-	defer readFile.Close()
-	if err != nil {
-		fmt.Println(err)
-	}
+func part2(elves int, readFile *os.File) int {
 	fileScanner := bufio.NewScanner(readFile)
 
 	fileScanner.Split(bufio.ScanLines)

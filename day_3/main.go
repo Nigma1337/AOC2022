@@ -32,9 +32,8 @@ func main() {
 				break
 			}
 		}
-		group[i] = text
-		i++
-		if i == 3 {
+		if i >= 2 {
+			group[i] = text
 			i = 0
 			for _, c := range group[0] {
 				if strings.ContainsRune(group[1], c) && strings.ContainsRune(group[2], c) {
@@ -42,6 +41,9 @@ func main() {
 					break
 				}
 			}
+		} else {
+			group[i] = text
+			i++
 		}
 	}
 	fmt.Printf("Part 1: %d\n", res)
