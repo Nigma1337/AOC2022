@@ -5,23 +5,28 @@ import (
 	"os"
 )
 
+// Empty structs take up 0 bytes (according to https://linuxhint.com/golang-set/)
+type void struct{}
+
+var member void
+
 func main() {
-	var m map[byte]int
-	var n map[byte]int
+	var m map[byte]void
+	var n map[byte]void
 	var part_1_done bool
 	readFile, err := os.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
 	}
 	for i := range readFile {
-		m = make(map[byte]int)
-		n = make(map[byte]int)
+		m = make(map[byte]void)
+		n = make(map[byte]void)
 		for _, c := range readFile[i : i+4] {
-			m[c] = 0
-			n[c] = 0
+			m[c] = member
+			n[c] = member
 		}
 		for _, c := range readFile[i+4 : i+14] {
-			n[c] = 0
+			n[c] = member
 		}
 		if len(m) == 4 && !part_1_done {
 			fmt.Printf("Part 1: %d\n", i+4)
