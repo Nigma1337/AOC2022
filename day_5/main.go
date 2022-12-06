@@ -42,33 +42,22 @@ func main() {
 	// Create new stacks from initial config
 	// := doesn't work as we're dealing with a slice, so we need to call copy explicitly
 	copy(stacksTwo, stacks)
+	// skip emptyline
+	fileScanner.Scan()
 	for fileScanner.Scan() {
 		text := fileScanner.Text()
-		if text == "" {
-			continue
-		}
 		sp := strings.Split(text, " ")
-		count, err := strconv.Atoi(sp[1])
-		if err != nil {
-			panic(err)
-		}
-		from, err := strconv.Atoi(sp[3])
-		if err != nil {
-			panic(err)
-		}
-		to, err := strconv.Atoi(sp[5])
-		if err != nil {
-			panic(err)
-		}
+		count, _ := strconv.Atoi(sp[1])
+		from, _ := strconv.Atoi(sp[3])
+		to, _ := strconv.Atoi(sp[5])
 		// zero index
 		from = from - 1
 		to = to - 1
-		slen := len(stacks[from])
 		for i := 0; i < count; i++ {
-			top := stacks[from][0]
+			// doing :1 instead of 0 returns a string instead of rune, and lets us skip a string() call later
+			top := stacks[from][:1]
 			stacks[from] = stacks[from][1:]
-			slen = slen - 1
-			stacks[to] = string(top) + string(stacks[to])
+			stacks[to] = top + string(stacks[to])
 		}
 		top := stacksTwo[from][:count]
 		stacksTwo[from] = stacksTwo[from][count:]
