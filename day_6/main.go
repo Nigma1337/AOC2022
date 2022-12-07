@@ -22,13 +22,15 @@ func main() {
 		m = make(map[byte]void)
 		n = make(map[byte]void)
 		for _, c := range readFile[i : i+4] {
-			m[c] = member
+			if !part_1_done {
+				m[c] = member
+			}
 			n[c] = member
 		}
 		for _, c := range readFile[i+4 : i+14] {
 			n[c] = member
 		}
-		if len(m) == 4 && !part_1_done {
+		if !part_1_done && len(m) == 4 {
 			fmt.Printf("Part 1: %d\n", i+4)
 			part_1_done = true
 		}
