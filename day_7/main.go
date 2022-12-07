@@ -4,21 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
 
 // Basic idea: Create binary tree from directory structure
 type node struct {
-	Size     int
+	Size     uint64
 	Name     string
 	Children []*node
 	Parent   *node
 }
-
-var result int
-var resTwo []int
 
 func main() {
 	var name string
@@ -26,24 +22,29 @@ func main() {
 	current := &root
 	fname := "input.txt"
 	readFile, err := os.Open(fname)
-	defer readFile.Close()
 	if err != nil {
-		fmt.Println(err)
+		panic("Failed to open file")
 	}
+	defer readFile.Close()
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 	for fileScanner.Scan() {
 		text := fileScanner.Text()
-		if text[:3] == "dir" {
-			name = text[4:]
+		if text == "$ ls" {
+			continue
+		}
+		sp := strings.Split(text, " ")
+		start := sp[0]
+		if start == "dir" {
+			name = sp[1]
 			index := dirInArray(name, current.Children)
 			// if -1, its not in array
 			if index == -1 {
 				new := root.New(name, current)
 				current.Children = append(current.Children, new)
 			}
-		} else if text[:4] == "$ cd" {
-			name = text[5:]
+		} else if start == "$" {
+			name = sp[2]
 			if name == ".." {
 				current = current.Parent
 				continue
@@ -60,25 +61,24 @@ func main() {
 			} else {
 				current = current.Children[index]
 			}
-		} else if text == "$ ls" {
-			continue
 		} else {
 			// file
-			length, err := strconv.Atoi(strings.Split(text, " ")[0])
+			length, err := strconv.ParseUint(start, 10, 64)
 			if err != nil {
 				panic("bad")
 			}
 			current.Size += length
 		}
 	}
-	root.Print(0)
 	dir_len(&root)
-	root.Print(0)
-	LT(&root, 100000)
-	fmt.Printf("Part 1: %d\n", result)
-	LTwo(&root, 8381165)
-	sort.Ints(resTwo)
-	fmt.Printf("Part 2: %d\n", resTwo[0])
+
+	//Get max uint64 (18,446,744,073,709,551,615)
+	res, resTwo := uint64(0), ^uint64(0)
+
+	calculatePartOne(&root, uint64(100000), &res)
+	calculatePartTwo(&root, 8381165, &resTwo)
+	fmt.Printf("Part 1: %d\n", res)
+	fmt.Printf("Part 2: %d\n", resTwo)
 }
 
 func (n *node) New(name string, parent *node) *node {
@@ -101,7 +101,7 @@ func dirInArray(name string, children []*node) int {
 	return -1
 }
 
-func dir_len(root *node) int {
+func dir_len(root *node) uint64 {
 	for _, child := range root.Children {
 		child.Size = dir_len(child)
 		root.Size += child.Size
@@ -109,20 +109,20 @@ func dir_len(root *node) int {
 	return root.Size
 }
 
-func LT(root *node, than int) {
+func calculatePartOne(root *node, than uint64, result *uint64) {
 	for _, child := range root.Children {
-		LT(child, than)
+		calculatePartOne(child, than, result)
 	}
 	if root.Size < than {
-		result += root.Size
+		*result = *result + root.Size
 	}
 }
 
-func LTwo(root *node, than int) {
+func calculatePartTwo(root *node, than uint64, result *uint64) {
 	for _, child := range root.Children {
-		LTwo(child, than)
+		calculatePartTwo(child, than, result)
 	}
-	if root.Size > than {
-		resTwo = append(resTwo, root.Size)
+	if root.Size > than && root.Size < *result {
+		*result = root.Size
 	}
 }
