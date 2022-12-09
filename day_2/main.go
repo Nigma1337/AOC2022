@@ -46,7 +46,6 @@ func main() {
 		score += pos[text]
 		scoreTwo += posTwo[text]
 	}
-	readFile.Close()
 	fmt.Printf("Part 1: %d\n", score)
 	fmt.Printf("Part 2: %d\n", scoreTwo)
 }
