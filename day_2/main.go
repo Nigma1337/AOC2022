@@ -8,10 +8,10 @@ import (
 
 func main() {
 	readFile, err := os.Open("input.txt")
-	defer readFile.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer readFile.Close()
 	// string is possible matchup, int is amount of points
 	pos := map[string]int{
 		"A Y": 8, // Rock vs Paper

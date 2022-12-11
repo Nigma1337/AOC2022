@@ -11,10 +11,10 @@ import (
 
 func main() {
 	readFile, err := os.Open("input.txt")
-	defer readFile.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer readFile.Close()
 	fileScanner := bufio.NewScanner(readFile)
 
 	fileScanner.Split(bufio.ScanLines)
