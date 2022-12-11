@@ -90,8 +90,8 @@ func main() {
 		monkies[i] = ape
 	}
 	copy(monkiesone, monkies)
-	res := solve(monkiesone, 20, true)
-	resTwo := solve(monkies, 10000, false)
+	res := solveOne(monkiesone, 20)
+	resTwo := solve(monkies, 10000)
 	activities := make([]int, monkey_count)
 	for i, ape := range res {
 		activities[i] = ape.activity
@@ -100,28 +100,45 @@ func main() {
 	for i, ape := range resTwo {
 		activitiestwo[i] = ape.activity
 	}
-	sort.Sort(sort.Reverse(sort.IntSlice(activities)))
-	sort.Sort(sort.Reverse(sort.IntSlice(activitiestwo)))
-	fmt.Printf("Part 1: %d\n", activities[0]*activities[1])
-	fmt.Printf("Part 2: %d\n", activitiestwo[0]*activitiestwo[1])
+	sort.Ints(activities)
+	sort.Ints(activitiestwo)
+	fmt.Printf("Part 1: %d\n", activities[monkey_count-1]*activities[monkey_count-2])
+	fmt.Printf("Part 2: %d\n", activitiestwo[monkey_count-1]*activitiestwo[monkey_count-2])
 }
 
-func solve(monkies []monkey, rounds int, partOne bool) []monkey {
+func solve(monkies []monkey, rounds int) []monkey {
 	for i := 0; i < rounds; i++ {
 		for j, ape := range monkies {
 			for _, item := range ape.starting {
 				var worry uint64
 				monkies[j].activity++
-				if partOne {
-					worryfloat := math.Floor(float64(ape.operation(item)) / 3.0)
-					worry = uint64(worryfloat)
-				} else {
-					var product int = 1
-					for _, monkey := range monkies {
-						product *= int(monkey.testint)
-					}
-					worry = ape.operation(item) % uint64(product)
+				var product uint64 = 1
+				for _, monkey := range monkies {
+					product *= monkey.testint
 				}
+				worry = ape.operation(item) % product
+				if ape.test(worry) {
+					//fmt.Printf("Monkey %d threw item with level %d to monkey %d as test was true\n", j, worry, ape.t)
+					monkies[ape.t].starting = append(monkies[ape.t].starting, worry)
+				} else {
+					//fmt.Printf("Monkey %d threw item with level %d to monkey %d as test was false\n", j, worry, ape.f)
+					monkies[ape.f].starting = append(monkies[ape.f].starting, worry)
+				}
+			}
+			monkies[j].starting = make([]uint64, 0)
+		}
+	}
+	return monkies
+}
+
+func solveOne(monkies []monkey, rounds int) []monkey {
+	for i := 0; i < rounds; i++ {
+		for j, ape := range monkies {
+			for _, item := range ape.starting {
+				var worry uint64
+				monkies[j].activity++
+				worryfloat := math.Floor(float64(ape.operation(item)) / 3.0)
+				worry = uint64(worryfloat)
 				if ape.test(worry) {
 					//fmt.Printf("Monkey %d threw item with level %d to monkey %d as test was true\n", j, worry, ape.t)
 					monkies[ape.t].starting = append(monkies[ape.t].starting, worry)
