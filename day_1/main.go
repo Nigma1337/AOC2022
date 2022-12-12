@@ -1,28 +1,23 @@
 package main
 
 import (
-	"bufio"
+	_ "embed"
 	"fmt"
-	"io"
-	"os"
 	"sort"
 	"strconv"
+	"strings"
 )
 
-func main() {
-	readFile, err := os.Open("input.txt")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer readFile.Close()
-	fileScanner := bufio.NewScanner(readFile)
+//go:embed input.txt
+var input string
 
-	fileScanner.Split(bufio.ScanLines)
-	max := 0
-	cur := 0
-	elves := 0
-	for fileScanner.Scan() {
-		text := fileScanner.Text()
+func main() {
+	var max int
+	var cur int
+	var elves int
+	sp := strings.Split(input, "\n")
+	for _, text := range sp {
+		text := strings.ReplaceAll(text, "\n", "")
 		if text == "" {
 			elves++
 			if max < cur {
@@ -38,19 +33,15 @@ func main() {
 		}
 	}
 	fmt.Printf("Part 1: %d\n", max)
-	readFile.Seek(0, io.SeekStart)
-	fmt.Printf("Part 2: %d\n", part2(elves, readFile))
+	fmt.Printf("Part 2: %d\n", part2(elves, sp))
 }
 
-func part2(elves int, readFile *os.File) int {
-	fileScanner := bufio.NewScanner(readFile)
-
-	fileScanner.Split(bufio.ScanLines)
+func part2(elves int, sp []string) int {
 	cur := 0
 	i := 0
 	result := make([]int, elves)
-	for fileScanner.Scan() {
-		text := fileScanner.Text()
+	for _, text := range sp {
+		text := strings.ReplaceAll(text, "\n", "")
 		if text == "" {
 			result[i] = cur
 			i++
